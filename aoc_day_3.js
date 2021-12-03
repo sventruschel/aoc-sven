@@ -1,84 +1,27 @@
-// const fs = require("fs");
-// const lines = fs
-//   .readFileSync("input_day_3.txt", { encoding: "utf-8" })
-//   .split("\n")
-//   .filter((x) => x)
-//   .map((x) => x);
+const fs = require("fs");
+const lines = fs
+  .readFileSync("input_day_3.txt", { encoding: "utf-8" })
+  .split("\n")
+  .filter((x) => x)
+  .map((x) => x);
 
-const { clear } = require("console");
+const getBitsFromPosition = (array, i) => array.map((e) => e[i]);
 
-const lines = [
-  "00100",
-  "11110",
-  "10110",
-  "10111",
-  "10101",
-  "01111",
-  "00111",
-  "11100",
-  "10000",
-  "11001",
-  "00010",
-  "01010",
-];
+const getBitCount = (array, dir) => {
+  let zeroCount = 0;
+  let oneCount = 0;
 
-const mostFreqStr = (arr) => {
-  var obj = {},
-    mostFreq = 0,
-    which = [];
+  array.forEach((e) => (e === "0" ? zeroCount++ : oneCount++));
 
-  arr.forEach((ea) => {
-    if (!obj[ea]) {
-      obj[ea] = 1;
-    } else {
-      obj[ea]++;
-    }
-
-    if (obj[ea] > mostFreq) {
-      mostFreq = obj[ea];
-      console.log("ea", [ea]);
-      which = [ea];
-    } else if (obj[ea] === mostFreq) {
-      which.push(ea);
-    }
-  });
-  console.log(obj);
-  return which;
-};
-
-const leastFreqStr = (arr, n) => {
-  // Sort the array
-  arr.sort();
-
-  // find the min frequency using
-  // linear traversal
-  let min_count = n + 1,
-    res = -1;
-  let curr_count = 1;
-
-  for (let i = 1; i < n; i++) {
-    if (arr[i] == arr[i - 1]) curr_count++;
-    else {
-      if (curr_count < min_count) {
-        min_count = curr_count;
-        res = arr[i - 1];
-      }
-
-      curr_count = 1;
-    }
+  if (zeroCount === oneCount) {
+    return dir === ">" ? "1" : "0";
+  } else if (oneCount > zeroCount) {
+    return dir === ">" ? "1" : "0";
   }
-
-  // If last element is least frequent
-  if (curr_count < min_count) {
-    min_count = curr_count;
-    res = arr[n - 1];
-  }
-
-  return res;
+  return dir === ">" ? "0" : "1";
 };
 
 const getConsumption = (array) => {
-  const newLines = array;
   let mostFreq = [];
   let leastFreq = [];
   for (let index = 0; index < 12; index++) {
@@ -86,36 +29,32 @@ const getConsumption = (array) => {
     array.forEach((element) => {
       numberArray.push(element[index]);
     });
-    mostFreq.push(mostFreqStr(numberArray));
-    leastFreq.push(leastFreqStr(numberArray, numberArray.length));
+    mostFreq.push(getBitCount(numberArray, ">"));
+    leastFreq.push(getBitCount(numberArray, "<"));
   }
   const gamma = parseInt(+mostFreq.join(""), 2);
-
   const epsilon = parseInt(+leastFreq.join(""), 2);
 
   return gamma * epsilon;
 };
 
-const getConsumption2 = (array) => {
-  let mostFreq = [];
-  let leastFreq = [];
-  for (let index = 0; index < 5; index++) {
-    let numberArray = [];
-    array.forEach((element) => {
-      numberArray.push(element[index]);
-    });
-    mostFreq.push(mostFreqStr(numberArray));
-    leastFreq.push(leastFreqStr(numberArray, numberArray.length));
+const getRating = (array, dir) => {
+  let ac = array;
+  for (let i = 0; i < 12; i++) {
+    const pos_row = getBitsFromPosition(ac, i);
+    const bitCount = getBitCount(pos_row, dir);
+    if (ac.length > 1) {
+      ac = ac.filter((e) => e[i] === bitCount);
+    }
   }
-
-  const gamma = mostFreq;
-  let newarr = array;
-  console.log(mostFreq);
-  mostFreq.forEach((el, i) => {
-    newarr = newarr.filter((e) => e[i] === el[0]);
-    console.log("el", el, "i", i);
-    console.log("newarr", newarr);
-  });
+  return parseInt(ac[0], 2);
 };
 
-getConsumption2(lines);
+const getLifeSupportRating = (array) => {
+  const ogyxenRating = getRating(array, ">");
+  const co2Rating = getRating(array, "<");
+  return ogyxenRating * co2Rating;
+};
+
+console.log("part 1: ", getConsumption(lines));
+console.log("part 2: ", getLifeSupportRating(lines));
