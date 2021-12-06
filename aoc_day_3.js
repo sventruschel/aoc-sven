@@ -1,9 +1,7 @@
 const fs = require("fs");
 const lines = fs
   .readFileSync("input_day_3.txt", { encoding: "utf-8" })
-  .split("\n")
-  .filter((x) => x)
-  .map((x) => x);
+  .split("\n");
 
 const getBitsFromPosition = (array, i) => array.map((e) => e[i]);
 
@@ -22,8 +20,8 @@ const getBitCount = (array, dir) => {
 };
 
 const getConsumption = (array) => {
-  let mostFreq = [];
-  let leastFreq = [];
+  let mostFreq = [],
+    leastFreq = [];
   for (let index = 0; index < 12; index++) {
     let numberArray = [];
     array.forEach((element) => {
@@ -32,9 +30,8 @@ const getConsumption = (array) => {
     mostFreq.push(getBitCount(numberArray, ">"));
     leastFreq.push(getBitCount(numberArray, "<"));
   }
-  const gamma = parseInt(+mostFreq.join(""), 2);
-  const epsilon = parseInt(+leastFreq.join(""), 2);
-
+  const gamma = parseInt(mostFreq.join(""), 2);
+  const epsilon = parseInt(leastFreq.join(""), 2);
   return gamma * epsilon;
 };
 
